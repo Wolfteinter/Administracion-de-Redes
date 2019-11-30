@@ -4,6 +4,7 @@ import os
 import platform
 import time
 import os
+import psutil
 #Tipo de queries
     #1 - Pedir datos constantes(nombre,SO)
     #2 - Pedir datos variables(numero de paketes,tipo de paquetes)
@@ -28,6 +29,7 @@ class Cliente(object):
             if opt == 2:
                 data = "1"
                 self.cli.send(data.encode())
+            if opt == 3: self.cli.send(str(psutil.net_io_counters(pernic=True)['lo'][1]).encode())
 
         self.cli.close()
 

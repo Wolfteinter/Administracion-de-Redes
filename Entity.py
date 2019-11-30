@@ -30,3 +30,11 @@ class Entity(object):
             return False
         else:
             return True
+    def getPackages(self):
+        try:
+            self.socket.send(bytes("3",'UTF-8'))
+            data = self.socket.recv(4096)
+        except:
+            return 0
+        else:
+            return data

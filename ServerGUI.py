@@ -110,18 +110,6 @@ class ServerGUI(object):
 
         btn3 = tk.Button(windowInfo,height=4,font=("Arial",15), width=100,text="Apagar computadora")
         btn3.pack()
-    def data_gen():
-        global t
-        if t >= 10000:
-            xdata.clear()
-            ydata.clear()
-            t = 0
-        t += 100
-        y0 = psutil.net_io_counters(pernic=True)['lo'][1]
-        time.sleep(1)
-        y1 = psutil.net_io_counters(pernic=True)['lo'][1]
-        y0 = y1-y0
-        yield t, y0
     def graphNetworkTraffic(self,dispositive):
         graph = tk.Tk()
         my_gui = NTGraphGUI(graph,dispositive)
