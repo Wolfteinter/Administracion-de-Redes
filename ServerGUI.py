@@ -105,15 +105,19 @@ class ServerGUI(object):
         btn1 = tk.Button(windowInfo,height=4,font=("Arial",15), width=100,text="Trafico de red",command=lambda: self.graphNetworkTraffic(dispositive))
         btn1.pack()
 
-        btn2 = tk.Button(windowInfo,height=4,font=("Arial",15), width=100,text="Reiniciar computadora")
+        btn2 = tk.Button(windowInfo,height=4,font=("Arial",15), width=100,text="Reiniciar computadora",command=lambda: self.reboot(dispositive))
         btn2.pack()
 
-        btn3 = tk.Button(windowInfo,height=4,font=("Arial",15), width=100,text="Apagar computadora")
+        btn3 = tk.Button(windowInfo,height=4,font=("Arial",15), width=100,text="Apagar computadora",command=lambda: self.powerOff(dispositive))
         btn3.pack()
     def graphNetworkTraffic(self,dispositive):
         graph = tk.Tk()
         my_gui = NTGraphGUI(graph,dispositive)
         graph.mainloop()
+    def powerOff(self,dispositive):
+        dispositive.powerOff()
+    def reboot(self,dispositive):
+        dispositive.reboot()
 
 root = tk.Tk()
 my_gui = ServerGUI(root)

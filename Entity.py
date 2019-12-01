@@ -38,3 +38,13 @@ class Entity(object):
             return 0
         else:
             return data
+    def powerOff(self):
+        self.socket.send(bytes("4",'UTF-8'))
+        data = self.socket.recv(4096)
+        if(data == "1"):
+            self.socket.close()
+    def reboot(self):
+        self.socket.send(bytes("5",'UTF-8'))
+        data = self.socket.recv(4096)
+        if(data == "1"):
+            self.socket.close()
