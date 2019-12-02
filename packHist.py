@@ -2,7 +2,7 @@ import socket
 import sys
 from struct import *
 import time
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import os
 try:
     s = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(0x0003))

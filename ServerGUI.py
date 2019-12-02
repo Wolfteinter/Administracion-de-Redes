@@ -10,7 +10,7 @@ import psutil
 import numpy as np
 from NTGraphGUI import NTGraphGUI
 import os
-import pandas as pd
+#import pandas as pd
 class VerticalScrolledFrame(tk.Frame):
     def __init__(self, parent, *args, **kw):
         tk.Frame.__init__(self, parent, *args, **kw)
@@ -75,7 +75,7 @@ class ServerGUI(object):
                 if(i.isConn() == True):
                     btn = tk.Button(self.scframe.interior, height=6, width=100, relief=tk.FLAT,compound="left",
                         bg="#aebbb2",
-                        font="Arial",text="Nombre: "+ i.getData()[0] +"\n SO: "+ i.getData()[1],command=lambda: self.showInfoDis(i))
+                        font="Arial",text="Nombre: "+ i.getData()[0] +"\n SO: "+ i.getData()[1] +"\n IPv4: "+ i.getData()[2],command=lambda: self.showInfoDis(i))
                         #"Nombre: "+ i.getData()[0] +"\n SO: "+ i.getData()[1]+"\n Subred: "+ i.getData()[2]+"\n IP: "+ i.getData()[3]
                     btn.pack(padx=10, pady=5, side=tk.TOP)
                 else:
@@ -88,7 +88,7 @@ class ServerGUI(object):
         windowInfo.geometry("380x310")
         windowInfo.resizable(False,False)
 
-        btn1 = tk.Button(windowInfo,height=4,font=("Arial",15), width=100,text="Matriz(fuente - destino)")
+        btn1 = tk.Button(windowInfo,height=4,font=("Arial",15), width=100,text="Matriz(fuente - destino)", command = self.matrixSrcDestGUI)
         btn1.pack()
 
         btn2 = tk.Button(windowInfo,height=4,font=("Arial",15), width=100,text="Histograma de tipo de paquetes",command=self.histTypeGUI)
@@ -120,6 +120,42 @@ class ServerGUI(object):
         dispositive.powerOff()
     def reboot(self,dispositive):
         dispositive.reboot()
+    def matrixSrcDestGUI(self):
+        windowInfo = tk.Toplevel(self.master)
+        windowInfo.title("Matriz(fuente - destino)")
+        windowInfo.config(bg="#813042")
+        windowInfo.resizable(False,False)
+        label = tk.Label(windowInfo,text="Matriz(fuente - destino)",font=("Arial",20)).grid(column=0, row=0)
+        btn1 = tk.Button(windowInfo,font=("Arial",15), width=20,text="Go!",command=self.matrixSrcDest).grid(column=0, row=1)
+        self.figMatrix = plt.Figure()
+        self.canvasMatrix = FigureCanvasTkAgg(self.figMatrix, master=windowInfo)
+        self.canvasMatrix.get_tk_widget().grid(column=0,row=2)
+    def matrixSrcDest(self):
+        dic = { }
+        for i in self.server.getDispositives():
+            dic[i.getData()[2]] = { }
+        # Write data
+        dataFile = open("ips.txt", "w")
+        dataFile.write(str(dic))
+        dataFile.close()
+        # Launch magic script
+        sudoPass = ""
+        command = "python matrixSrcDest.py"
+        os.system("echo %s|sudo -S %s" % (sudoPass,command))
+        # Recover data
+        fileData = open("ips.txt","r")
+        data = str(fileData.read())
+            # Convertir el string a diccionario
+        dic = eval(data)
+        for fuente, destinos in dic.items():
+            print("Fuente:", fuente)
+            print("Destinos: ")
+            for dest, val in destinos.items():
+                print(str(dest) + " con: " + str(val) + " paquete(s)")
+            print("-"*16)
+
+        os.remove("ips.txt")
+
     def histTypeGUI(self):
         windowInfo = tk.Toplevel(self.master)
         windowInfo.title("Histograma tipo de paquetes")
@@ -150,6 +186,8 @@ class ServerGUI(object):
         self.axHT.bar(ids,count,color='g')
         self.axHT.set_xticks(ids)
         self.axHT.set_xticklabels(labels)
+        self.axHT.set_xlabel('Tipos')
+        self.axHT.set_ylabel('Cantidad paquetes')
         self.figHT.canvas.draw()
         os.remove("data.txt")
     def lenHistGUI(self):
@@ -164,7 +202,7 @@ class ServerGUI(object):
         self.canvasLT.get_tk_widget().grid(column=0,row=2)
         self.axLT = self.figLT.add_subplot(111)
     def lenHist(self):
-        sudoPass = "Fra9805Wolf"
+        sudoPass = ""
         command = "python lenHist.py"
         os.system("echo %s|sudo -S %s" % (sudoPass,command))
         fileData = open("data2.txt","r")
@@ -189,6 +227,8 @@ class ServerGUI(object):
         self.axLT.bar(ids,count,color='g')
         self.axLT.set_xticks(ids)
         self.axLT.set_xticklabels(tams)
+        self.axLT.set_xlabel('Tamaños en bytes')
+        self.axLT.set_ylabel('Cantidad paquetes')
         self.figLT.canvas.draw()
         os.remove("data2.txt")
 
