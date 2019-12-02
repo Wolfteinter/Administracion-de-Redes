@@ -16,7 +16,7 @@ except Exception as e:
     print('Socket could not be created')
     sys.exit()
 
-for i in range(25):
+for i in range(100):
     packet = s.recvfrom(65565)
     # packet string from tuple
     packet = packet[0]

@@ -127,9 +127,9 @@ class ServerGUI(object):
         windowInfo.resizable(False,False)
         label = tk.Label(windowInfo,text="Matriz(fuente - destino)",font=("Arial",20)).grid(column=0, row=0)
         btn1 = tk.Button(windowInfo,font=("Arial",15), width=20,text="Go!",command=self.matrixSrcDest).grid(column=0, row=1)
-        self.figMatrix = plt.Figure()
-        self.canvasMatrix = FigureCanvasTkAgg(self.figMatrix, master=windowInfo)
-        self.canvasMatrix.get_tk_widget().grid(column=0,row=2)
+        self.op = tk.Text(windowInfo,height=10,width=42,font=("Arial",15))
+        self.op.grid(column=0,row=2)
+
     def matrixSrcDest(self):
         dic = { }
         for i in self.server.getDispositives():
@@ -139,7 +139,7 @@ class ServerGUI(object):
         dataFile.write(str(dic))
         dataFile.close()
         # Launch magic script
-        sudoPass = ""
+        sudoPass = "Fra9805Wolf"
         command = "python matrixSrcDest.py"
         os.system("echo %s|sudo -S %s" % (sudoPass,command))
         # Recover data
@@ -147,12 +147,18 @@ class ServerGUI(object):
         data = str(fileData.read())
             # Convertir el string a diccionario
         dic = eval(data)
+        textTo = ""
         for fuente, destinos in dic.items():
+            textTo += "Fuente: "+str(fuente)+"\n"
             print("Fuente:", fuente)
             print("Destinos: ")
+            textTo += "Destinos"+"\n"
             for dest, val in destinos.items():
                 print(str(dest) + " con: " + str(val) + " paquete(s)")
+                textTo +=str(dest)+" con "+str(val)+ " paquetes(s)"+ "\n"
             print("-"*16)
+            textTo += "-"*16+"\n"
+        self.op.insert(tk.END,textTo)
 
         os.remove("ips.txt")
 
@@ -202,7 +208,7 @@ class ServerGUI(object):
         self.canvasLT.get_tk_widget().grid(column=0,row=2)
         self.axLT = self.figLT.add_subplot(111)
     def lenHist(self):
-        sudoPass = ""
+        sudoPass = "Fra9805Wolf"
         command = "python lenHist.py"
         os.system("echo %s|sudo -S %s" % (sudoPass,command))
         fileData = open("data2.txt","r")
