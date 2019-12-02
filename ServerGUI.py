@@ -94,7 +94,7 @@ class ServerGUI(object):
         btn2 = tk.Button(windowInfo,height=4,font=("Arial",15), width=100,text="Histograma de tipo de paquetes",command=self.histTypeGUI)
         btn2.pack()
 
-        btn3 = tk.Button(windowInfo,height=4,font=("Arial",15), width=100,text="Histograma de tam de paquetes")
+        btn3 = tk.Button(windowInfo,height=4,font=("Arial",15), width=100,text="Histograma de tam de paquetes",command = self.lenHistGUI)
         btn3.pack()
 
     def showInfoDis(self,dispositive):
@@ -152,6 +152,45 @@ class ServerGUI(object):
         self.axHT.set_xticklabels(labels)
         self.figHT.canvas.draw()
         os.remove("data.txt")
+    def lenHistGUI(self):
+        windowInfo = tk.Toplevel(self.master)
+        windowInfo.title("Histograma tamaño de paquetes")
+        windowInfo.config(bg="#813042")
+        windowInfo.resizable(False,False)
+        label = tk.Label(windowInfo,text="Histograma tamaño de paquetes",font=("Arial",20)).grid(column=0, row=0)
+        btn1 = tk.Button(windowInfo,font=("Arial",15), width=20,text="Empezar",command=self.lenHist).grid(column=0, row=1)
+        self.figLT = plt.Figure()
+        self.canvasLT = FigureCanvasTkAgg(self.figLT, master=windowInfo)
+        self.canvasLT.get_tk_widget().grid(column=0,row=2)
+        self.axLT = self.figLT.add_subplot(111)
+    def lenHist(self):
+        sudoPass = "Fra9805Wolf"
+        command = "python lenHist.py"
+        os.system("echo %s|sudo -S %s" % (sudoPass,command))
+        fileData = open("data2.txt","r")
+        data = str(fileData.read())
+        data = data.rstrip('\n')
+        data = data.split("|")
+        for i in range(len(data)):
+            data[i] = data[i].replace("[",'')
+            data[i] = data[i].replace("]",'')
+        tams = list(map(int, filter(None, data[0].split(','))))
+        count = list(map(int, filter(None, data[1].split(','))))
+        datas = list(zip(tams,count))
+        datas.sort(key=lambda tup: tup[1],reverse=True)
+        datas = datas[0:10]
+        datas = list(zip(*datas))
+        tams = list(datas[0])
+        count = list(datas[1])
+        ids = list(range(len(tams)))
+        print(tams)
+        print(count)
+        print(ids)
+        self.axLT.bar(ids,count,color='g')
+        self.axLT.set_xticks(ids)
+        self.axLT.set_xticklabels(tams)
+        self.figLT.canvas.draw()
+        os.remove("data2.txt")
 
 root = tk.Tk()
 my_gui = ServerGUI(root)
