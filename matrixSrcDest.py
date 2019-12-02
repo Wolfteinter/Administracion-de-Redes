@@ -16,7 +16,7 @@ except Exception as e:
     print('Socket could not be created')
     sys.exit()
 
-for i in range(25):
+for i in range(100):
     packet = s.recvfrom(65565)
     # packet string from tuple
     packet = packet[0]
@@ -38,11 +38,11 @@ for i in range(25):
 
         s_addr = socket.inet_ntoa(iph[8])
         d_addr = socket.inet_ntoa(iph[9])
-        if(dic.has_key(s_addr) and dic.has_key(d_addr)):
+        if(dic.has_key(s_addr)):
             if(dic[s_addr].has_key(d_addr)):
                 dic[s_addr][d_addr] += 1
             else:
-                dic[s_addr][d_addr] = 0
+                dic[s_addr][d_addr] = 1
             print("src: " + str(s_addr) + " dest: " + str(d_addr))
 
 #print(dic)

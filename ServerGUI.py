@@ -2,11 +2,13 @@ import tkinter as tk
 from Server import Server
 import socket, threading
 import time
+from functools import partial
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.animation as animation
 import time
 import psutil
+import ipaddress
 import numpy as np
 from NTGraphGUI import NTGraphGUI
 import os
@@ -73,9 +75,10 @@ class ServerGUI(object):
                 widget.destroy()
             for i in self.server.getDispositives():
                 if(i.isConn() == True):
+                    action_with_arg = partial(self.showInfoDis, i)
                     btn = tk.Button(self.scframe.interior, height=6, width=100, relief=tk.FLAT,compound="left",
                         bg="#aebbb2",
-                        font="Arial",text="Nombre: "+ i.getData()[0] +"\n SO: "+ i.getData()[1] +"\n IPv4: "+ i.getData()[2],command=lambda: self.showInfoDis(i))
+                        font="Arial",text="Nombre: "+ i.getData()[0] +"\n SO: "+ i.getData()[1] +"\n IPv4: "+ i.getData()[2],command=action_with_arg)
                         #"Nombre: "+ i.getData()[0] +"\n SO: "+ i.getData()[1]+"\n Subred: "+ i.getData()[2]+"\n IP: "+ i.getData()[3]
                     btn.pack(padx=10, pady=5, side=tk.TOP)
                 else:
@@ -124,14 +127,15 @@ class ServerGUI(object):
         windowInfo = tk.Toplevel(self.master)
         windowInfo.title("Matriz(fuente - destino)")
         windowInfo.config(bg="#813042")
-        windowInfo.resizable(False,False)
+        windowInfo.resizable(False,True)
         label = tk.Label(windowInfo,text="Matriz(fuente - destino)",font=("Arial",20)).grid(column=0, row=0)
         btn1 = tk.Button(windowInfo,font=("Arial",15), width=20,text="Go!",command=self.matrixSrcDest).grid(column=0, row=1)
-        self.figMatrix = plt.Figure()
-        self.canvasMatrix = FigureCanvasTkAgg(self.figMatrix, master=windowInfo)
-        self.canvasMatrix.get_tk_widget().grid(column=0,row=2)
+        self.op = tk.Text(windowInfo,height=10,width=42,font=("Arial",15))
+        self.op.grid(column=0,row=2)
     def matrixSrcDest(self):
         dic = { }
+        local_ip = ipaddress.ip_address('192.168.15.1')
+        dic[local_ip.compressed] = { }
         for i in self.server.getDispositives():
             dic[i.getData()[2]] = { }
         # Write data
@@ -139,7 +143,7 @@ class ServerGUI(object):
         dataFile.write(str(dic))
         dataFile.close()
         # Launch magic script
-        sudoPass = ""
+        sudoPass = "powerdonas"
         command = "python matrixSrcDest.py"
         os.system("echo %s|sudo -S %s" % (sudoPass,command))
         # Recover data
@@ -147,13 +151,18 @@ class ServerGUI(object):
         data = str(fileData.read())
             # Convertir el string a diccionario
         dic = eval(data)
+        textTo = ""
         for fuente, destinos in dic.items():
+            textTo += "Fuente: "+str(fuente)+"\n"
             print("Fuente:", fuente)
             print("Destinos: ")
+            textTo += "Destinos"+"\n"
             for dest, val in destinos.items():
                 print(str(dest) + " con: " + str(val) + " paquete(s)")
+                textTo +=str(dest)+" con "+str(val)+ " paquetes(s)"+ "\n"
             print("-"*16)
-
+            textTo += "-"*16+"\n"
+        self.op.insert(tk.END,textTo)
         os.remove("ips.txt")
 
     def histTypeGUI(self):
@@ -169,7 +178,7 @@ class ServerGUI(object):
         self.axHT = self.figHT.add_subplot(111)
         #self.axHT.set_ylim([0,1000])
     def histType(self):
-        sudoPass = ""
+        sudoPass = "powerdonas"
         command = "python packHist.py"
         os.system("echo %s|sudo -S %s" % (sudoPass,command))
         fileData = open("data.txt","r")
@@ -202,7 +211,7 @@ class ServerGUI(object):
         self.canvasLT.get_tk_widget().grid(column=0,row=2)
         self.axLT = self.figLT.add_subplot(111)
     def lenHist(self):
-        sudoPass = ""
+        sudoPass = "powerdonas"
         command = "python lenHist.py"
         os.system("echo %s|sudo -S %s" % (sudoPass,command))
         fileData = open("data2.txt","r")
@@ -234,3 +243,4 @@ class ServerGUI(object):
 
 root = tk.Tk()
 my_gui = ServerGUI(root)
+
