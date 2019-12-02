@@ -8,6 +8,7 @@ class Server(object):
         self.PORT = 8080
         #The socket of the server
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #self.sServer = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(0x0003))
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.socket.bind(("",self.PORT))
         threading.Thread(target=self.listenDisp).start()

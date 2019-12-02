@@ -9,6 +9,8 @@ import time
 import psutil
 import numpy as np
 from NTGraphGUI import NTGraphGUI
+import os
+import pandas as pd
 class VerticalScrolledFrame(tk.Frame):
     def __init__(self, parent, *args, **kw):
         tk.Frame.__init__(self, parent, *args, **kw)
@@ -89,10 +91,10 @@ class ServerGUI(object):
         btn1 = tk.Button(windowInfo,height=4,font=("Arial",15), width=100,text="Matriz(fuente - destino)")
         btn1.pack()
 
-        btn2 = tk.Button(windowInfo,height=4,font=("Arial",15), width=100,text="Histograma de tipo de paquetes")
+        btn2 = tk.Button(windowInfo,height=4,font=("Arial",15), width=100,text="Histograma de tipo de paquetes",command=self.histTypeGUI)
         btn2.pack()
 
-        btn3 = tk.Button(windowInfo,height=4,font=("Arial",15), width=100,text="Histograma de tamaño de paquetes")
+        btn3 = tk.Button(windowInfo,height=4,font=("Arial",15), width=100,text="Histograma de tam de paquetes")
         btn3.pack()
 
     def showInfoDis(self,dispositive):
@@ -118,6 +120,38 @@ class ServerGUI(object):
         dispositive.powerOff()
     def reboot(self,dispositive):
         dispositive.reboot()
+    def histTypeGUI(self):
+        windowInfo = tk.Toplevel(self.master)
+        windowInfo.title("Histograma tipo de paquetes")
+        windowInfo.config(bg="#813042")
+        windowInfo.resizable(False,False)
+        label = tk.Label(windowInfo,text="Histograma tipo de paquetes",font=("Arial",20)).grid(column=0, row=0)
+        btn1 = tk.Button(windowInfo,font=("Arial",15), width=20,text="Empezar",command=self.histType).grid(column=0, row=1)
+        self.figHT = plt.Figure()
+        self.canvasHT = FigureCanvasTkAgg(self.figHT, master=windowInfo)
+        self.canvasHT.get_tk_widget().grid(column=0,row=2)
+        self.axHT = self.figHT.add_subplot(111)
+        #self.axHT.set_ylim([0,1000])
+    def histType(self):
+        sudoPass = "Fra9805Wolf"
+        command = "python packHist.py"
+        os.system("echo %s|sudo -S %s" % (sudoPass,command))
+        fileData = open("data.txt","r")
+        data = str(fileData.read())
+        data = data.rstrip('\n')
+        data = data.split("|")
+        for i in range(len(data)):
+            data[i] = data[i].replace("[",'')
+            data[i] = data[i].replace("]",'')
+        print(data[0])
+        ids = list(map(int, filter(None, data[0].split(','))))
+        count = list(map(int, filter(None, data[1].split(','))))
+        labels = list(map(str, filter(None, data[2].split(','))))
+        self.axHT.bar(ids,count,color='g')
+        self.axHT.set_xticks(ids)
+        self.axHT.set_xticklabels(labels)
+        self.figHT.canvas.draw()
+        os.remove("data.txt")
 
 root = tk.Tk()
 my_gui = ServerGUI(root)
