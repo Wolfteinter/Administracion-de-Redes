@@ -133,7 +133,7 @@ class ServerGUI(object):
         self.axHT = self.figHT.add_subplot(111)
         #self.axHT.set_ylim([0,1000])
     def histType(self):
-        sudoPass = ""
+        sudoPass = "Fra9805Wolf"
         command = "python packHist.py"
         os.system("echo %s|sudo -S %s" % (sudoPass,command))
         fileData = open("data.txt","r")
