@@ -16,7 +16,7 @@ class Server(object):
         while True:
             self.socket.listen(1)
             clientsock, clientAddress = self.socket.accept()
-            entity = Entity(clientsock)
+            entity = Entity(clientsock, clientAddress[0])
             self.dispositives.append(entity)
     def getDispositives(self):
         return self.dispositives
