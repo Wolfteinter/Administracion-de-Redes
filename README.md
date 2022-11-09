@@ -5,7 +5,7 @@
 - `pip install tk`
 ## Pasos para ejecutar
 - `python3 ServerGUI.py`
-- Abrir otra terminal y ejecutar las veces que se necesite
+- (Abrir otra terminal y ejecutar) las veces que se necesite
 - `python3 Client.py 127.0.0.1`
 
 Nota: 127.0.0.1, es un parametro donde se ingresa el host que se quiere usar.
