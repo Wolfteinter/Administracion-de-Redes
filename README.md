@@ -11,3 +11,7 @@
 Nota: 127.0.0.1, es un parametro donde se ingresa el host que se quiere usar.
 ## Imagen de SeverGUI
 ![image](https://user-images.githubusercontent.com/36217766/200935079-33220182-31b8-4c52-810c-bc854598661f.png)
+
+
+Chat:
+- David says: Hola Onder
